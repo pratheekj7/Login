@@ -63,5 +63,3 @@ user id:
 **Prevention Techniques**
 1. Use of Prepared Statements (with Parameterized Queries)
 2. Use of Stored Procedures
-3. Whitelist Input Validation
-4. Escaping All User Supplied Input
