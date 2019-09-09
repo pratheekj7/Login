@@ -1,37 +1,66 @@
-## Welcome to GitHub Pages
+**What is _SQL Injection_?**
+>SQL injection is a code injection technique that might destroy your database.
+>SQL injection is one of the most common web hacking techniques.
+>SQL injection is the placement of malicious code in SQL statements, via web page input.
 
-You can use the [editor on GitHub](https://github.com/pratheekj7/Login/edit/master/index.md) to maintain and preview the content for your website in Markdown files.
+**SQL in Web Pages**
+>SQL injection usually occurs when you ask a user for input, like their username/userid, and instead of a name/id, the user gives you an SQL statement that you will unknowingly run on your database.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+>Look at the following example which creates a SELECT statement by adding a variable (userId) to a select string. The variable is fetched from user input (getRequestString):
 
-### Markdown
+>**Example**
+userId = getRequestString("UserId");
+sql = "SELECT * FROM Users WHERE UserId = " + userId;
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+**SQL Injection Examples**
+1. _SQL Injection Based on 1=1 is Always True_
+>Look at the example above again. The original purpose of the code was to create an SQL statement to select a user, with a given user id.
 
-```markdown
-Syntax highlighted code block
+>If there is nothing to prevent a user from entering "wrong" input, the user can enter some "smart" input like this:
 
-# Header 1
-## Header 2
-### Header 3
+>userId: 
+105 OR 1=1
 
-- Bulleted
-- List
+>Then, the SQL statement will look like this:
 
-1. Numbered
-2. List
+>**SELECT UserId, Name, Password FROM Users WHERE UserId = 105 or 1=1;**
+The SQL above is valid and will return userId, name, password from the "Users" table, since OR 1=1 is always TRUE.
 
-**Bold** and _Italic_ and `Code` text
+>A hacker might get access to all the user names and passwords in a database, by simply inserting 105 OR 1=1 into the input field.
 
-[Link](url) and ![Image](src)
-```
+2. _SQL Injection Based on ""="" is Always True_
+  >A hacker might get access to user names and passwords in a database by simply inserting " OR ""=" into the user name or password text box:
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+>User Name:
+" or ""="
+Password:
+" or ""="
 
-### Jekyll Themes
+>The code at the server will create a valid SQL statement like this:
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/pratheekj7/Login/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+>**SELECT * FROM Users WHERE Name ="" or ""="" AND Pass ="" or ""="";**
+The SQL above is valid and will return all rows from the "Users" table, since OR ""="" is always TRUE.
 
-### Support or Contact
+3. _SQL Injection Based on Batched SQL Statements_ 
+>A batch of SQL statements is a group of two or more SQL statements, separated by semicolons.
 
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+>The SQL statement below will return all rows from the "Users" table, then delete the "Suppliers" table.
+>**SELECT * FROM Users; DROP TABLE Suppliers;**
+
+>Look at the following example:
+
+>userId = getRequestString("UserId");
+SQL = "SELECT * FROM Users WHERE UserId = " + userId;
+
+>And the following input:
+user id: 
+105; DROP TABLE Suppliers
+
+>The valid SQL statement would look like this:
+
+>**SELECT * FROM Users WHERE UserId = 105; DROP TABLE Suppliers;**
+
+**Prevention Techniques**
+1. Use of Prepared Statements (with Parameterized Queries)
+2. Use of Stored Procedures
+
